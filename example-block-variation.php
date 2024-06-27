@@ -19,7 +19,155 @@
  *
  * @return void
  */
-function wpdev_example_register_post_meta() {
+function wpdev_example_register_post() {
+
+	register_post_type(
+		'book',
+		array(
+			'labels'                => array(
+				'name'          => __( 'Books', 'peoplesbancorp' ),
+				'singular_name' => __( 'Book', 'peoplesbancorp' ),
+			),
+			'public'                => true,
+			'publicly_queryable'    => true,
+			'show_ui'               => true,
+			'show_in_menu'          => true,
+			'show_in_nav_menus'     => true,
+			'show_in_admin_bar'     => true,
+			'query_var'             => true,
+			'capability_type'       => 'post',
+			'has_archive'           => false,
+			'hierarchical'          => false,
+			'menu_position'         => null,
+			'supports'              => array( 'editor', 'title', 'thumbnail', 'custom-fields' ),
+			'menu_icon'             => 'dashicons-book',
+			'show_in_rest'          => true,
+			'rest_base'             => 'book',
+			'rest_controller_class' => 'WP_REST_Posts_Controller',
+			'rewrite'               => array(
+				'slug' => 'book',
+			),
+			'template'              => array(
+				array(
+					'core/group',
+					array(
+						'templateLock'    => 'all',
+						'lock'            => array(
+							'move'   => true,
+							'remove' => true,
+						),
+						'style'           => array(
+							'spacing' => array(
+								'padding' => array(
+									'right'  => 'var:preset|spacing|10',
+									'left'   => 'var:preset|spacing|10',
+									'top'    => 'var:preset|spacing|10',
+									'bottom' => 'var:preset|spacing|10',
+								),
+							),
+						),
+						'backgroundColor' => 'accent-5',
+						'layout'          => array(
+							'type' => 'constrained',
+						),
+					),
+					array(
+						array(
+							'core/post-title',
+							array(
+								'level' => 1,
+							),
+							array(),
+						),
+						array(
+							'core/group',
+							array(
+								'layout' => array(
+									'type'     => 'flex',
+									'flexWrap' => 'nowrap',
+								),
+							),
+							array(
+								array(
+									'core/paragraph',
+									array(
+										'content' => 'ISBN: ',
+									),
+									array(),
+								),
+								array(
+									'core/paragraph',
+									array(
+										'metadata' => array(
+											'bindings' => array(
+												'content' => array(
+													'source' => 'core/post-meta',
+													'args' => array(
+														'key' => 'isbn',
+													),
+												),
+											),
+										),
+									),
+									array(),
+								),
+								array(
+									'core/buttons',
+									array(),
+									array(
+										array(
+											'core/button',
+											array(
+												'metadata' => array(
+													'bindings' => array(
+														'url' => array(
+															'source' => 'core/post-meta',
+															'args' => array(
+																'key' => 'amazon',
+															),
+														),
+													),
+												),
+												'text'     => 'Amazon',
+											),
+											array(),
+										),
+										array(
+											'core/button',
+											array(
+												'metadata' => array(
+													'bindings' => array(
+														'url' => array(
+															'source' => 'core/post-meta',
+															'args' => array(
+																'key' => 'goodreads',
+															),
+														),
+													),
+												),
+												'text'     => 'Goodreads',
+											),
+											array(),
+										),
+
+									),
+								),
+
+							),
+						),
+
+					),
+				),
+				array(
+					'core/paragraph',
+					array(),
+					array(),
+				),
+
+			),
+		)
+	);
+
 	register_post_meta(
 		'book',
 		'isbn',
@@ -27,6 +175,7 @@ function wpdev_example_register_post_meta() {
 			'show_in_rest' => true,
 			'single'       => true,
 			'type'         => 'string',
+			'default'      => '000000001',
 		)
 	);
 	register_post_meta(
@@ -36,6 +185,7 @@ function wpdev_example_register_post_meta() {
 			'show_in_rest' => true,
 			'single'       => true,
 			'type'         => 'string',
+			'default'      => 'https://www.amazon.com/',
 		)
 	);
 	register_post_meta(
@@ -45,11 +195,12 @@ function wpdev_example_register_post_meta() {
 			'show_in_rest' => true,
 			'single'       => true,
 			'type'         => 'string',
+			'default'      => 'https://www.goodreads.com/',
 		)
 	);
 }
-add_action( 'init', 'wpdev_example_register_post_meta' );
-add_action( 'rest_api_init', 'wpdev_example_register_post_meta' );
+add_action( 'init', 'wpdev_example_register_post' );
+
 
 
 /**
@@ -109,7 +260,7 @@ function wpdev_block_type_variations( $variations, $block_type ) {
 				array(
 					'core/button',
 					array(
-						'metadata' => array(
+						'metadata'   => array(
 							'bindings' => array(
 								'url' => array(
 									'source' => 'core/post-meta',
@@ -119,13 +270,14 @@ function wpdev_block_type_variations( $variations, $block_type ) {
 								),
 							),
 						),
-						'text'     => 'Amazon',
+						'text'       => 'Amazon',
+						'linkTarget' => '_blank',
 					),
 				),
 				array(
 					'core/button',
 					array(
-						'metadata' => array(
+						'metadata'   => array(
 							'bindings' => array(
 								'url' => array(
 									'source' => 'core/post-meta',
@@ -135,7 +287,8 @@ function wpdev_block_type_variations( $variations, $block_type ) {
 								),
 							),
 						),
-						'text'     => 'Goodreads',
+						'text'       => 'Goodreads',
+						'linkTarget' => '_blank',
 					),
 				),
 			),
